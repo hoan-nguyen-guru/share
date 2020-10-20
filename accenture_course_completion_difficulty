@@ -1,0 +1,19 @@
+select
+       dc.unique_id as course_id,
+       dc.short_title,
+       c.difficulty_id,
+       sum(case when dc.is_certification_prep is true then 1 else 0 end) as is_cert_ct,
+       sum(case when dc.primary_topic = 'certification' then 1 else 0 end) as is_topic_cert,
+       count(*)
+from semantic_layer.attr_user_course_completion_summary_monthly ucs
+    join semantic_layer.dim_user u
+        on u.user_id = ucs.user_id
+    join semantic_layer.spectrum_content_course__course dc
+        on dc.short_title = ucs.course_title
+    left join spectrum_warehouse_la_npii.d_courses c
+         on c.acg_course_id = dc.unique_id
+where true
+and total_progress > .8
+and u.organisation_id = '34b195c8-27ee-4977-b7e7-2c3f1258e215'
+and ucs.completion_month >= '2020-01-01'
+group by 1,2,3
