@@ -2,9 +2,9 @@ select
        dc.unique_id as course_id,
        dc.short_title,
        c.difficulty_id,
-       sum(case when dc.is_certification_prep is true then 1 else 0 end) as is_cert_ct,
-       sum(case when dc.primary_topic = 'certification' then 1 else 0 end) as is_topic_cert,
-       count(*)
+       count(distinct case when dc.is_certification_prep is true then ucs.user_id||ucs.course_title else null  end) as is_cert_ct,
+       count(distinct case when dc.primary_topic = 'certification' then ucs.user_id||ucs.course_title else null  end) as is_topic_cert,
+       count(distinct ucs.user_id)
 from semantic_layer.attr_user_course_completion_summary_monthly ucs
     join semantic_layer.dim_user u
         on u.user_id = ucs.user_id
